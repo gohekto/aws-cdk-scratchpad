@@ -31,10 +31,12 @@ export const tokenVendingMachine = async (username: string, roleArn: string, tab
       RoleSessionName: `${username}`,
       DurationSeconds: 15 * 60,
       Policy: JSON.stringify(sessionPolicy),
-      Tags: [{
-        Key: "username",
-        Value: username
-      }]
+      Tags: [
+        {
+          Key: 'username',
+          Value: username
+        }
+      ]
     })
   );
 
@@ -51,7 +53,7 @@ export const tokenVendingMachine = async (username: string, roleArn: string, tab
 
   return credentials;
   } catch (e) {
-    console.log({e});
+    console.error({e});
     throw e;
   }
 }
