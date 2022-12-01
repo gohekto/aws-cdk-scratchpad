@@ -9,12 +9,13 @@ import { getCredentials } from './helper'
 
 const stsClient = new STSClient({});
 
+// this should be moved into @hekto/cloud-spec-aws-cdk, should allow
+// to provide type-safe outputs
 const output = (stack: Stack, name: string, value: string) => {
   new CfnOutput(stack, name, {
     value,
   })
 }
-
 
 const testApp = createTestApp({
   creator: (stack) => {
