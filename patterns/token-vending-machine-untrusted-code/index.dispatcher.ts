@@ -1,5 +1,5 @@
 import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
-import { tokenVendingMachine } from './vending-machine';
+import { tokenVendingMachine } from './lib/vending-machine';
 import { parse, build } from '@aws-sdk/util-arn-parser'
 
 export const handler = async (event: any, context: any) => {

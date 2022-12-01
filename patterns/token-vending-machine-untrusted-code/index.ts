@@ -1,44 +1,10 @@
 import { Construct } from "constructs";
-import { CfnOutput, Duration, Stack } from "aws-cdk-lib";
+import { Duration } from "aws-cdk-lib";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import { AttributeType, BillingMode, Table } from "aws-cdk-lib/aws-dynamodb";
-import { Role, Policy, ServicePrincipal, ArnPrincipal, SessionTagsPrincipal } from "aws-cdk-lib/aws-iam";
 import * as iam from "cdk-iam-floyd";
-
-interface TokenVendingMachineRoleConfig {
-  readonly principalRoleArn: string;
-  readonly policyStatements: iam.PolicyStatement[]
-}
-
-class TokenVendingMachineRole extends Construct {
-  public readonly resource: Role;
-  public readonly arn: string;
-  public readonly name: string;
-  private readonly policyStatements: iam.PolicyStatement[] = [];
-
-  constructor(scope: Construct, id: string, config: TokenVendingMachineRoleConfig) {
-    super(scope, id);
-
-    const { principalRoleArn } = config;
-    this.policyStatements = config.policyStatements;
-
-    this.name = `token-vending-machine-${this.node.addr}`.substring(0, 32);
-
-    const tvmRole = new Role(this, "token-vending-machine", {
-      roleName: this.name,
-      assumedBy: new SessionTagsPrincipal(new ArnPrincipal(principalRoleArn)),
-    });
-
-    this.arn = tvmRole.roleArn;
-
-    tvmRole.attachInlinePolicy(new Policy(this, "token-vending-machine-policy", {
-      statements: this.policyStatements
-    }));
-
-    this.resource = tvmRole;
-  }
-}
+import { TokenVendingMachineRole } from './constructs/token-vending-machine';
 
 export class TokenVendingMachineUntrustedCode extends Construct {
   public readonly bucket: Bucket;
@@ -102,6 +68,6 @@ export class TokenVendingMachineUntrustedCode extends Construct {
     });
 
     // role.resource.grantAssumeRole(dispatcher.role!);
-    dispatcher.addEnvironment('TVM_ROLE_ARN', role.arn)
+    dispatcher.addEnvironment('TVM_ROLE_ARN', role.resource.roleArn)
   }
 }

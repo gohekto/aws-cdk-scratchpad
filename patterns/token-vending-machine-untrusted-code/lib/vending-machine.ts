@@ -36,6 +36,9 @@ export const tokenVendingMachine = async (username: string, roleArn: string, tab
           Key: 'username',
           Value: username
         }
+      ],
+      TransitiveTagKeys: [
+        'username'
       ]
     })
   );
