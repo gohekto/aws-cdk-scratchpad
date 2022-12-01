@@ -29,6 +29,7 @@ const testApp = createTestApp({
         new iam.S3()
         .allow()
         .toGetObject()
+        // https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_variables.html
         .on(
           `${bucket.bucketArn}/\${aws:PrincipalTag/username}/*`
         )
