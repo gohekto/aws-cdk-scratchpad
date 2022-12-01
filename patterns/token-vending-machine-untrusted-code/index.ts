@@ -4,7 +4,7 @@ import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import { AttributeType, BillingMode, Table } from "aws-cdk-lib/aws-dynamodb";
 import * as iam from "cdk-iam-floyd";
-import { TokenVendingMachineRole } from './constructs/token-vending-machine';
+import { TokenVendingMachineRole } from '../constructs/token-vending-machine';
 
 export class TokenVendingMachineUntrustedCode extends Construct {
   public readonly bucket: Bucket;

@@ -1,5 +1,5 @@
 import { STSClient, AssumeRoleCommand } from "@aws-sdk/client-sts";
-import { Credentials } from "@aws-sdk/types";
+import { AwsCredentialIdentity } from "@aws-sdk/types";
 import * as iam from 'iam-floyd';
 
 const stsClient = new STSClient({});
@@ -47,7 +47,7 @@ export const tokenVendingMachine = async (username: string, roleArn: string, tab
   if (sts.Credentials.AccessKeyId == null) throw new Error('No access key');
   if (sts.Credentials.SecretAccessKey == null) throw new Error('No secret key');
 
-  const credentials: Credentials = {
+  const credentials: AwsCredentialIdentity = {
     accessKeyId: sts.Credentials.AccessKeyId,
     secretAccessKey: sts.Credentials.SecretAccessKey,
     sessionToken: sts.Credentials.SessionToken,

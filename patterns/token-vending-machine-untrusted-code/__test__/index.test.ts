@@ -1,5 +1,5 @@
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
-import { putObject } from './helper';
+import { putObject } from '../../test-helper/helper';
 import { TokenVendingMachineUntrustedCode } from "..";
 import { cdkSpec, createTestApp } from "@hekto/cloud-spec-aws-cdk";
 import { CfnOutput } from "aws-cdk-lib";
