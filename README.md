@@ -1,14 +1,5 @@
-# Welcome to your CDK TypeScript project
+# AWS CDK Scratchpad
 
-This is a blank project for CDK development with TypeScript.
+This a collection of experimental patterns, mostly in the serverless space. A playground to see what's working and rather than throwing it away, just published here as is.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
-
-## Useful commands
-
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+Nb: For informational purpose only, don't use any of these patterns in production. No guarantees whatsoever.
