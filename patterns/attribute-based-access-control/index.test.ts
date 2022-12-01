@@ -47,12 +47,7 @@ describe("attribute based access control", () => {
       testApp,
     });
 
-    cloud.it("succeeds with correctly tagged role session", async (outputs) => {
-      const { role, bucket } = outputs[testApp.stackName]
-      await putObject(bucket, 'skorfmann/foo.txt', 'Hello, world!', 'text/plain')
-
-      const username = 'skorfmann';
-
+    const assumeRoleAndGetObject = async (role: string, username: string, bucket: string) => {
       const sts = await stsClient.send(
         new AssumeRoleCommand({
           RoleArn: role,
@@ -67,14 +62,21 @@ describe("attribute based access control", () => {
       );
 
       const s3Client = new S3Client({credentials: getCredentials(sts.Credentials)});
-      const s3 = await s3Client.send(
+      return await s3Client.send(
         new GetObjectCommand({
           Bucket: bucket,
           Key: 'skorfmann/foo.txt',
         }),
-      );
+      )
+    }
 
-      expect(s3.$metadata.httpStatusCode).toEqual(200);
+    cloud.it("succeeds with correctly tagged role session", async (outputs) => {
+      const { role, bucket } = outputs[testApp.stackName]
+      await putObject(bucket, 'skorfmann/foo.txt', 'Hello, world!', 'text/plain')
+
+      const username = 'skorfmann';
+      const s3Result = await assumeRoleAndGetObject(role, username, bucket);
+      expect(s3Result.$metadata.httpStatusCode).toEqual(200);
     }, 10_000);
 
     cloud.it("fails with incorrectly tagged role session", async (outputs) => {
@@ -82,28 +84,8 @@ describe("attribute based access control", () => {
       await putObject(bucket, 'skorfmann/foo.txt', 'Hello, world!', 'text/plain')
 
       const username = 'other';
-
-      const sts = await stsClient.send(
-        new AssumeRoleCommand({
-          RoleArn: role,
-          RoleSessionName: `${username}`,
-          Tags: [
-            {
-              Key: 'username',
-              Value: username
-            }
-          ]
-        })
-      );
-
-      const s3Client = new S3Client({credentials: getCredentials(sts.Credentials)});
       await expect(
-        s3Client.send(
-          new GetObjectCommand({
-            Bucket: bucket,
-            Key: 'skorfmann/foo.txt',
-          }),
-        )
+        assumeRoleAndGetObject(role, username, bucket)
       ).rejects.toThrow('Access Denied');
     }, 10_000);
   });
