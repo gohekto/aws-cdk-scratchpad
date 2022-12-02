@@ -38,9 +38,6 @@ jobs:
         - name: Install dependencies
           run: pnpm install
 
-        - name: Build
-          run: pnpm build
-
         - name: Configure AWS credentials from Test account
           uses: aws-actions/configure-aws-credentials@v1
           with:
