@@ -1,11 +1,15 @@
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
 import { putObject } from '../../test-helper/helper';
 import { TokenVendingMachineUntrustedCode } from "..";
-import { cdkSpec, createTestApp } from "@hekto/cloud-spec-aws-cdk";
+import { cdkSpec, createTestApp, ForceEphemeralResources } from "@hekto/cloud-spec-aws-cdk";
+import { Aspects } from "aws-cdk-lib";
 
 const testApp = createTestApp({
   creator: (stack, outputs) => {
     const component = new TokenVendingMachineUntrustedCode(stack, 'token-vending-machine-untrusted-code');
+
+    // this should probabl go into cloud-spec-aws-cdk
+    Aspects.of(stack).add(new ForceEphemeralResources());
 
     outputs({
       "bucket": component.bucket.bucketName,
