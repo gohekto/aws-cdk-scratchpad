@@ -1,5 +1,5 @@
 import { cdkSpec as cloud, createTestApp } from "@hekto/cloud-spec-aws-cdk";
-import { CfnOutput, aws_s3, aws_iam, Stack } from "aws-cdk-lib";
+import { aws_s3, aws_iam } from "aws-cdk-lib";
 import { STSClient, AssumeRoleCommand } from "@aws-sdk/client-sts";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { putObject } from '../test-helper/helper';
@@ -9,16 +9,8 @@ import { getCredentials } from './helper'
 
 const stsClient = new STSClient({});
 
-// this should be moved into @hekto/cloud-spec-aws-cdk, should allow
-// to provide type-safe outputs
-const output = (stack: Stack, name: string, value: string) => {
-  new CfnOutput(stack, name, {
-    value,
-  })
-}
-
 const testApp = createTestApp({
-  creator: (stack) => {
+  creator: (stack, outputs) => {
     const bucket = new aws_s3.Bucket(stack, "test-bucket");
 
     const role = new aws_iam.Role(stack, "abac", {
@@ -37,15 +29,17 @@ const testApp = createTestApp({
       ]
     }));
 
-    output(stack, "bucket", bucket.bucketName);
-    output(stack, "role", role.roleArn);
+    outputs({
+      "bucket": bucket.bucketName,
+      "role": role.roleArn,
+    })
   },
 })
 
 describe("attribute based access control", () => {
   describe("s3 bucket access via policy variables", () => {
     cloud.setup({
-      testApp,
+      testApp
     });
 
     const assumeRoleAndGetObject = async (role: string, username: string, bucket: string) => {
@@ -72,7 +66,7 @@ describe("attribute based access control", () => {
     }
 
     cloud.it("succeeds with correctly tagged role session", async (outputs) => {
-      const { role, bucket } = outputs[testApp.stackName]
+      const { role, bucket } = outputs
       await putObject(bucket, 'skorfmann/foo.txt', 'Hello, world!', 'text/plain')
 
       const username = 'skorfmann';
@@ -81,7 +75,7 @@ describe("attribute based access control", () => {
     }, 10_000);
 
     cloud.it("fails with incorrectly tagged role session", async (outputs) => {
-      const { role, bucket } = outputs[testApp.stackName]
+      const { role, bucket } = outputs
       await putObject(bucket, 'skorfmann/foo.txt', 'Hello, world!', 'text/plain')
 
       const username = 'other';
