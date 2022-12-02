@@ -40,6 +40,7 @@ jobs:
       strategy:
         matrix:
           test: ${{ fromJson(needs.setup.outputs['tests']) }}
+        fail-fast: false
       timeout-minutes: 15
       runs-on: ubuntu-latest
       # These permissions are needed to interact with GitHub's OIDC Token endpoint.
