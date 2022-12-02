@@ -9,17 +9,30 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
+  setup:
+      runs-on: ubuntu-latest
+      outputs:
+        tests: ${{ steps['set-tests'].outputs['tests'] }}
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 2
+        - id: set-tests
+          name: Set Tests
+          run: echo "::set-output name=tests::$(npx jest --listTests --json)"
   build:
       name: Build and Test
+      needs:
+        - setup
+      strategy:
+        matrix:
+          test: ${{ fromJson(needs.setup.outputs['tests']) }}
       timeout-minutes: 15
       runs-on: ubuntu-latest
       # These permissions are needed to interact with GitHub's OIDC Token endpoint.
       permissions:
         id-token: write
         contents: read
-      strategy:
-        matrix:
-          node-version: [16]
 
       steps:
         - name: Check out code
@@ -31,10 +44,10 @@ jobs:
           with:
             version: 7
 
-        - name: Use Node.js ${{ matrix.node-version }}
+        - name: Use Node.js
           uses: actions/setup-node@v3
           with:
-            node-version: ${{ matrix.node-version }}
+            node-version: 16
             cache: 'pnpm'
 
         - name: Install dependencies
@@ -48,4 +61,4 @@ jobs:
             aws-region: ${{ secrets.AWS_REGION }}
 
         - name: Test
-          run: pnpm test
+          run: npx jest ${{ matrix.test }}
