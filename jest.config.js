@@ -9,4 +9,7 @@ module.exports = {
     "uuid": require.resolve('uuid'),
   },
   testMatch: ['**/*.test.ts'],
+  globals: {
+    CLOUD_SPEC_PROJECT_NAME: 'cdk-serverless-scratchpad',
+  },
 }
