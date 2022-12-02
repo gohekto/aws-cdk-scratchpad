@@ -1,5 +1,5 @@
-import { cdkSpec as cloud, createTestApp } from "@hekto/cloud-spec-aws-cdk";
-import { aws_s3, aws_iam } from "aws-cdk-lib";
+import { cdkSpec as cloud, createTestApp, ForceEphemeralResources } from "@hekto/cloud-spec-aws-cdk";
+import { aws_s3, aws_iam, Aspects } from "aws-cdk-lib";
 import { STSClient, AssumeRoleCommand } from "@aws-sdk/client-sts";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { putObject } from '../test-helper/helper';
@@ -28,6 +28,8 @@ const testApp = createTestApp({
         )
       ]
     }));
+
+    Aspects.of(stack).add(new ForceEphemeralResources());
 
     outputs({
       "bucket": bucket.bucketName,
