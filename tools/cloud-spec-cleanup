@@ -33,6 +33,7 @@ const client = new CloudFormationClient({});
     console.log(`Deleting stack ${stackName}`);
     await client.send(new DeleteStackCommand({ StackName: stackName }));
     console.log(`Deleted stack ${stackName}`);
+
     // print stack status while waiting for deletion to succeed
     while (true) {
       try {
