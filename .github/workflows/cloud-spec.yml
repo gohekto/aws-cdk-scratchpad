@@ -1,0 +1,41 @@
+name: Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  setup:
+      env:
+        CLOUD_SPEC_PROJECT_NAME: cdk-serverless-scratchpad
+      runs-on: ubuntu-latest
+      outputs:
+        tests: ${{ steps['set-tests'].outputs['tests'] }}
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 2
+        - uses: pnpm/action-setup@v2.0.1
+          with:
+            version: 7
+
+        - name: Use Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: 16
+            cache: 'pnpm'
+
+        - name: Install dependencies
+          run: pnpm install
+
+        - name: Configure AWS credentials from Test account
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            role-session-name: aws-cdk-scratchpad-tests
+            role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+            aws-region: ${{ secrets.AWS_REGION }}
+
+        - name: Test
+          run: pnpm cloud-spec-cleanup

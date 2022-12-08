@@ -10,6 +10,7 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
+    "cloud-spec-cleanup": "./tools/cloud-spec-cleanup",
     "diagrams:generate": "find . -name \"diagram.py\" -execdir python3 {} \\;"
   },
   "devDependencies": {
@@ -21,8 +22,10 @@
     "typescript": "~3.9"
   },
   "dependencies": {
+    "@aws-sdk/client-cloudformation": "^3.226.0",
     "@aws-sdk/client-dynamodb": "^3.218.0",
     "@aws-sdk/client-lambda": "^3.219.0",
+    "@aws-sdk/client-resource-groups-tagging-api": "^3.226.0",
     "@aws-sdk/client-s3": "^3.218.0",
     "@aws-sdk/client-sts": "^3.218.0",
     "@aws-sdk/lib-dynamodb": "^3.218.0",

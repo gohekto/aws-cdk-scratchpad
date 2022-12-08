@@ -1,0 +1,51 @@
+#! /usr/bin/env node
+
+const { CloudFormationClient, DeleteStackCommand, DescribeStacksCommand } = require('@aws-sdk/client-cloudformation');
+const { ResourceGroupsTaggingAPIClient, GetResourcesCommand } = require('@aws-sdk/client-resource-groups-tagging-api');
+const client = new CloudFormationClient({});
+
+
+// find all stacks tagged with "cloud-spec-cleanup"
+(async () => {
+  const taggingClient = new ResourceGroupsTaggingAPIClient({});
+  const stacks = await taggingClient.send(new GetResourcesCommand({
+    TagFilters: [
+      {
+        Key: 'CloudSpecProjectName',
+        Values: [process.env.CLOUD_SPEC_PROJECT_NAME]
+      },
+      {
+        Key: 'GitRefName',
+        Values: [process.env.GITHUB_REF_NAME]
+      }
+    ],
+    ResourceTypeFilters: ['cloudformation:stack']
+  }));
+
+  if (stacks.ResourceTagMappingList.length === 0) {
+    console.log('No stacks found');
+    return;
+  }
+
+  // delete all stacks in parallel and wait for them to be deleted while priniting progress
+  await Promise.all(stacks.ResourceTagMappingList.map(async (stack) => {
+    const stackName = stack.ResourceARN.split('/')[1];
+    console.log(`Deleting stack ${stackName}`);
+    await client.send(new DeleteStackCommand({ StackName: stackName }));
+    console.log(`Deleted stack ${stackName}`);
+    // print stack status while waiting for deletion to succeed
+    while (true) {
+      try {
+        const { Stacks } = await client.send(new DescribeStacksCommand({ StackName: stackName }));
+        console.log(`Stack ${stackName} status: ${Stacks[0].StackStatus}`);
+        await new Promise(resolve => setTimeout(resolve, 2500));
+      } catch (error) {
+        if (error.name !== 'ValidationError') {
+          throw error;
+        }
+        console.log(`Stack ${stackName} status: DELETE_COMPLETE`);
+        break;
+      }
+    }
+  }));
+})();
