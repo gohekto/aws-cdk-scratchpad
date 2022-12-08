@@ -7,10 +7,13 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  setup:
+  cleanup:
       env:
         CLOUD_SPEC_PROJECT_NAME: cdk-serverless-scratchpad
       runs-on: ubuntu-latest
+      permissions:
+        id-token: write
+        contents: read
       outputs:
         tests: ${{ steps['set-tests'].outputs['tests'] }}
       steps:
