@@ -27,14 +27,10 @@ const client = new CloudFormationClient({});
     return;
   }
 
-  // delete all stacks in parallel and wait for them to be deleted while priniting progress
   await Promise.all(stacks.ResourceTagMappingList.map(async (stack) => {
     const stackName = stack.ResourceARN.split('/')[1];
     console.log(`Deleting stack ${stackName}`);
     await client.send(new DeleteStackCommand({ StackName: stackName }));
-    console.log(`Deleted stack ${stackName}`);
-
-    // print stack status while waiting for deletion to succeed
     while (true) {
       try {
         const { Stacks } = await client.send(new DescribeStacksCommand({ StackName: stackName }));
