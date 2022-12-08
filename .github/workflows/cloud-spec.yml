@@ -10,6 +10,7 @@ jobs:
   cleanup:
       env:
         CLOUD_SPEC_PROJECT_NAME: cdk-serverless-scratchpad
+        CLOUD_SPEC_GIT_REF_NAME: ${{ github.event.pull_request.number }}/merge
       runs-on: ubuntu-latest
       permissions:
         id-token: write

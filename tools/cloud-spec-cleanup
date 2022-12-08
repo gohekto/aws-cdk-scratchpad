@@ -16,7 +16,7 @@ const client = new CloudFormationClient({});
       },
       {
         Key: 'GitRefName',
-        Values: [process.env.GITHUB_REF_NAME]
+        Values: [process.env.CLOUD_SPEC_GIT_REF_NAME]
       }
     ],
     ResourceTypeFilters: ['cloudformation:stack']
