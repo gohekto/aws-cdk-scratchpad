@@ -38,7 +38,7 @@ jobs:
       needs:
         - setup
       strategy:
-        max-parallel: 5
+        max-parallel: 10
         matrix:
           test: ${{ fromJson(needs.setup.outputs['tests']) }}
         fail-fast: false
