@@ -8,17 +8,20 @@ const client = new CloudFormationClient({});
 // find all stacks tagged with "cloud-spec-cleanup"
 (async () => {
   const taggingClient = new ResourceGroupsTaggingAPIClient({});
+  const tagFilters = [
+    {
+      Key: 'CloudSpecProjectName',
+      Values: [process.env.CLOUD_SPEC_PROJECT_NAME]
+    },
+  ]
+  if (process.env.CLOUD_SPEC_GIT_REF_NAME) {
+    tagFilters.push(      {
+      Key: 'GitRefName',
+      Values: [process.env.CLOUD_SPEC_GIT_REF_NAME]
+    });
+  }
   const stacks = await taggingClient.send(new GetResourcesCommand({
-    TagFilters: [
-      {
-        Key: 'CloudSpecProjectName',
-        Values: [process.env.CLOUD_SPEC_PROJECT_NAME]
-      },
-      {
-        Key: 'GitRefName',
-        Values: [process.env.CLOUD_SPEC_GIT_REF_NAME]
-      }
-    ],
+    TagFilters: tagFilters,
     ResourceTypeFilters: ['cloudformation:stack']
   }));
 
