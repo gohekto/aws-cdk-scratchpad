@@ -67,6 +67,11 @@ jobs:
         - name: Install dependencies
           run: pnpm install
 
+        - name: Teardown test stacks after tests if on main branch
+          run: |
+            echo "DESTROY_CDK_STACKS=true" >> $GITHUB_ENV
+          if: ${{ github.ref == 'refs/heads/main' }}
+
         - name: Configure AWS credentials from Test account
           uses: aws-actions/configure-aws-credentials@v1
           with:

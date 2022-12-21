@@ -42,7 +42,10 @@ const testApp = createTestApp({
 
 describe("terraform lambda runner", () => {
   cloud.setup({
-    testApp
+    testApp,
+    forceDestroy: true,
+    setupTimeout: 600_000,
+    destroyTimeout: 600_000,
   });
 
   cloud.it("succeeds", async (outputs) => {
