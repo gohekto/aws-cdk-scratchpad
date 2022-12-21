@@ -99,5 +99,5 @@ describe("terraform codebuild runner", () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-  }, 60_000);
+  }, 180_000);
 });
